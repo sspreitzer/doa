@@ -1,0 +1,41 @@
+#!/bin/env sh
+
+export ANSIBLE_NOCOLOR=1
+
+helptext() {
+  echo blah
+}
+
+if [ -z "$1" ]; then
+  helptext
+  exit 1
+fi
+
+readloop() {
+  if [ -z "$2" ]; then
+    hostpattern=all
+  else
+    hostpattern=$2
+  fi
+  while read -p '>> ' command; do
+    run $hostpattern $command
+  done
+}
+
+run() {
+  hostpattern=$1
+  shift
+  ansible $hostpattern -m shell -a "$*"
+}
+
+case $1 in
+  -h)
+    helptext
+    ;;
+  -x)
+    readloop
+    ;;
+  *)
+    run $*
+    ;;
+esac
